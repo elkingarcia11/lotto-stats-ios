@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "main_numbers": [
+      9,
+      22,
+      28,
+      54,
+      63
+    ],
+    "mega_ball": 10,
+    "attempts_needed": 1
+  },
+  "message": ""
+}

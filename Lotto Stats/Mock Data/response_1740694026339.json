@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "data": {
+    "exists": false,
+    "main_numbers": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "mega_ball": 0
+  },
+  "message": ""
+}

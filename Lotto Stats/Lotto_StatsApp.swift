@@ -17,9 +17,11 @@ struct ContentView: View {
                     LotteryView(type: .megaMillions)
                 } label: {
                     HStack {
-                        Image(systemName: "dollarsign.circle.fill")
+                        Image("MegaMillions")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 44)
                             .foregroundColor(.green)
-                        Text("Mega Millions")
                     }
                 }
                 
@@ -27,13 +29,19 @@ struct ContentView: View {
                     LotteryView(type: .powerball)
                 } label: {
                     HStack {
-                        Image(systemName: "powerplug.fill")
+                        Image("Powerball")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 44)
                             .foregroundColor(.red)
-                        Text("Powerball")
                     }
                 }
             }
             .navigationTitle("Lotto Stats")
         }
     }
+}
+
+#Preview {
+    ContentView()
 }

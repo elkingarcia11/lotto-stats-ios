@@ -3,96 +3,156 @@ import SwiftUI
 
 @MainActor
 class LotteryViewModel: ObservableObject {
-    private let networkService = NetworkService.shared
-    let type: LotteryType
-    
-    @Published var numberPercentages: [NumberPercentage] = []
-    @Published var positionPercentages: [PositionPercentages] = []
-    @Published var specialBallPercentages: [NumberPercentage] = []
-    @Published var isLoading = false
-    @Published var error: String?
-    @Published var selectedNumbers: Set<Int> = []
-    @Published var selectedSpecialBall: Int?
-    @Published var generatedCombination: CombinationData?
-    @Published var combinationExists: Bool?
-    
-    init(type: LotteryType) {
-        self.type = type
+    // MARK: - Types
+    enum ViewState: Equatable {
+        case idle
+        case loading
+        case error(String)
+        case loaded
+        
+        static func == (lhs: ViewState, rhs: ViewState) -> Bool {
+            switch (lhs, rhs) {
+            case (.idle, .idle),
+                 (.loading, .loading),
+                 (.loaded, .loaded):
+                return true
+            case (.error(let lhsError), .error(let rhsError)):
+                return lhsError == rhsError
+            default:
+                return false
+            }
+        }
     }
     
+    struct FrequencyState {
+        var numberPercentages: [NumberPercentage] = []
+        var positionPercentages: [PositionPercentages] = []
+        var specialBallPercentages: [NumberPercentage] = []
+    }
+    
+    struct SelectionState {
+        var selectedNumbers: Set<Int> = []
+        var selectedSpecialBall: Int?
+        var winningDates: [String]?
+        var frequency: Int?
+        
+        var canCheckCombination: Bool {
+            selectedNumbers.count == 5 && selectedSpecialBall != nil
+        }
+    }
+    
+    // MARK: - Properties
+    let type: LotteryType
+    private let networkService: NetworkServiceProtocol
+    
+    @Published private(set) var viewState: ViewState = .idle
+    @Published private(set) var frequencyState = FrequencyState()
+    @Published var selectionState = SelectionState()
+    @Published var latestResults: [DrawResult] = []
+    
+    var error: String? {
+        if case .error(let message) = viewState {
+            return message
+        }
+        return nil
+    }
+    
+    var isLoading: Bool {
+        viewState == .loading
+    }
+    
+    // MARK: - Initialization
+    init(type: LotteryType, networkService: NetworkServiceProtocol = NetworkService.shared) {
+        self.type = type
+        self.networkService = networkService
+    }
+    
+    // MARK: - Public Methods
     func loadAllData() async {
-        isLoading = true
-        error = nil
+        viewState = .loading
         
         do {
-            async let frequenciesTask = networkService.fetchFrequencies(for: type)
-            async let positionFrequenciesTask = networkService.fetchPositionFrequencies(for: type)
-            async let specialBallFrequenciesTask = networkService.fetchSpecialBallFrequencies(for: type)
+            async let latestNumbersTask = networkService.fetchLatestNumbers(for: type, limit: nil)
+            async let frequencyTask = networkService.fetchFrequencies(for: type)
+            async let positionFrequencyTask = networkService.fetchPositionFrequencies(for: type)
+            async let specialBallFrequencyTask = networkService.fetchSpecialBallFrequencies(for: type)
             
-            let (frequencies, positionFrequencies, specialBallFrequencies) = try await (frequenciesTask, positionFrequenciesTask, specialBallFrequenciesTask)
+            let (latestNumbersResponse, frequencyResponse, positionFrequencyResponse, specialBallFrequencyResponse) = 
+                try await (latestNumbersTask, frequencyTask, positionFrequencyTask, specialBallFrequencyTask)
             
-            self.numberPercentages = parsePercentages(frequencies.data.frequencies)
-            self.positionPercentages = parsePositionPercentages(positionFrequencies.data.positionFrequencies)
-            self.specialBallPercentages = parsePercentages(specialBallFrequencies.data.frequencies)
+            latestResults = latestNumbersResponse.data.latestNumbers
+            frequencyState.numberPercentages = parsePercentages(frequencyResponse.data.frequencies)
+            frequencyState.positionPercentages = parsePositionPercentages(positionFrequencyResponse.data.positionFrequencies)
+            
+            // Handle special ball frequencies based on lottery type
+            let specialBallFreqs = type == .megaMillions ? 
+                specialBallFrequencyResponse.data.megaBallFrequencies :
+                specialBallFrequencyResponse.data.powerballFrequencies
+            frequencyState.specialBallPercentages = parsePercentages(specialBallFreqs)
+            
+            viewState = .loaded
         } catch {
-            self.error = error.localizedDescription
+            viewState = .error(error.localizedDescription)
         }
-        
-        isLoading = false
     }
     
     func checkCombination() async {
-        guard selectedNumbers.count == 5, let specialBall = selectedSpecialBall else {
-            error = "Please select 5 numbers and a special ball"
-            return
-        }
+        guard selectionState.canCheckCombination else { return }
         
-        isLoading = true
-        error = nil
+        viewState = .loading
+        selectionState.winningDates = nil
+        selectionState.frequency = nil
         
         do {
             let response = try await networkService.checkCombination(
-                type: type,
-                numbers: Array(selectedNumbers).sorted(),
-                specialBall: specialBall
+                numbers: Array(selectionState.selectedNumbers).sorted(),
+                specialBall: selectionState.selectedSpecialBall!,
+                type: type
             )
-            combinationExists = response.data.exists
+            
+            selectionState.winningDates = response.data.dates
+            selectionState.frequency = response.data.frequency
+            viewState = .loaded
         } catch {
-            self.error = error.localizedDescription
+            viewState = .error(error.localizedDescription)
         }
-        
-        isLoading = false
     }
     
     func generateCombination() async {
-        isLoading = true
-        error = nil
+        viewState = .loading
         
         do {
             let response = try await networkService.generateCombination(for: type)
-            generatedCombination = response.data
-            
-            if let numbers = response.data.mainNumbers {
-                selectedNumbers = Set(numbers)
-            }
-            selectedSpecialBall = response.data.specialBall
+            selectionState.selectedNumbers = Set(response.data.mainNumbers)
+            selectionState.selectedSpecialBall = response.data.specialBall
+            viewState = .loaded
         } catch {
-            self.error = error.localizedDescription
+            viewState = .error(error.localizedDescription)
         }
-        
-        isLoading = false
     }
     
     func toggleNumber(_ number: Int) {
-        if selectedNumbers.contains(number) {
-            selectedNumbers.remove(number)
-        } else if selectedNumbers.count < 5 {
-            selectedNumbers.insert(number)
+        if selectionState.selectedNumbers.contains(number) {
+            selectionState.selectedNumbers.remove(number)
+        } else if selectionState.selectedNumbers.count < 5 {
+            selectionState.selectedNumbers.insert(number)
         }
+        resetResults()
     }
     
     func selectSpecialBall(_ number: Int) {
-        selectedSpecialBall = number
+        if selectionState.selectedSpecialBall == number {
+            selectionState.selectedSpecialBall = nil
+        } else {
+            selectionState.selectedSpecialBall = number
+        }
+        resetResults()
+    }
+    
+    // MARK: - Private Methods
+    private func resetResults() {
+        selectionState.winningDates = nil
+        selectionState.frequency = nil
     }
     
     private func parsePercentages(_ frequencies: [String: Double]?) -> [NumberPercentage] {

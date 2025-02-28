@@ -1,10 +1,3 @@
-//
-//  Lotto_StatsTests.swift
-//  Lotto StatsTests
-//
-//  Created by Elkin Garcia on 2/27/25.
-//
-
 import XCTest
 @testable import Lotto_Stats
 

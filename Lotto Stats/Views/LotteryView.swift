@@ -2,6 +2,8 @@ import SwiftUI
 
 struct LotteryView: View {
     @StateObject private var viewModel: LotteryViewModel
+    @State private var showingResults = false
+    @State private var showingError = false
     @State private var selectedTab = 0
     
     init(type: LotteryType) {
@@ -9,23 +11,92 @@ struct LotteryView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                TabView(selection: $selectedTab) {
-                    statisticsView
-                        .tag(0)
-                    
-                    combinationView
-                        .tag(1)
+        TabView(selection: $selectedTab) {
+            // Pick Numbers Tab
+            pickNumbersView
+                .tabItem {
+                    Label("Pick Numbers", systemImage: "number.circle")
                 }
-                .frame(height: UIScreen.main.bounds.height * 0.8)
-                .tabViewStyle(.page)
+                .tag(0)
+            
+            // Latest Results Tab
+            LatestNumbersView(type: viewModel.type, results: viewModel.latestResults)
+                .tabItem {
+                    Label("Latest Results", systemImage: "list.bullet")
+                }
+                .tag(1)
+            
+            // Frequency Analysis Tab
+            FrequencyChartsView(
+                type: viewModel.type,
+                numberPercentages: viewModel.frequencyState.numberPercentages,
+                positionPercentages: viewModel.frequencyState.positionPercentages,
+                specialBallPercentages: viewModel.frequencyState.specialBallPercentages
+            )
+            .tabItem {
+                Label("Analysis", systemImage: "chart.bar")
+            }
+            .tag(2)
+        }
+        .task {
+            await viewModel.loadAllData()
+        }
+    }
+    
+    private var pickNumbersView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("Main Numbers (select 5)")
+                    .font(.headline)
+                
+                NumberGrid(
+                    range: viewModel.type.mainNumberRange,
+                    selectedNumbers: viewModel.selectionState.selectedNumbers,
+                    maxSelections: 5,
+                    onNumberTapped: viewModel.toggleNumber
+                )
+                
+                Text("\(viewModel.type.specialBallName) (select 1)")
+                    .font(.headline)
+                
+                NumberGrid(
+                    range: viewModel.type.specialBallRange,
+                    selectedNumbers: viewModel.selectionState.selectedSpecialBall.map { [$0] } ?? [],
+                    maxSelections: 1,
+                    onNumberTapped: viewModel.selectSpecialBall
+                )
+                
+                if viewModel.selectionState.canCheckCombination {
+                    Button {
+                        Task {
+                            await viewModel.checkCombination()
+                            showingResults = true
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                            Text("Check Numbers")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                    }
+                    .padding()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
             }
             .padding()
         }
-        .navigationTitle(viewModel.type == .megaMillions ? "Mega Millions" : "Powerball")
-        .task {
-            await viewModel.loadAllData()
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Image(viewModel.type == .megaMillions ? "MegaMillions" : "Powerball")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 32)
+                    .foregroundColor(viewModel.type == .megaMillions ? .green : .red)
+            }
         }
         .overlay {
             if viewModel.isLoading {
@@ -35,104 +106,63 @@ struct LotteryView: View {
                     .background(Color.black.opacity(0.2))
             }
         }
-        .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-            Button("OK") {
-                viewModel.error = nil
-            }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK", role: .cancel) { }
         } message: {
-            Text(viewModel.error ?? "")
+            if let error = viewModel.error {
+                Text(error)
+            }
+        }
+        .onChange(of: viewModel.error) { error in
+            showingError = error != nil
+        }
+        .navigationDestination(isPresented: $showingResults) {
+            if let specialBall = viewModel.selectionState.selectedSpecialBall {
+                LotteryResultView(
+                    type: viewModel.type,
+                    numbers: Array(viewModel.selectionState.selectedNumbers).sorted(),
+                    specialBall: specialBall,
+                    winningDates: viewModel.selectionState.winningDates,
+                    frequency: viewModel.selectionState.frequency
+                )
+            }
         }
     }
+}
+
+struct DrawResultRow: View {
+    let result: DrawResult
     
-    private var statisticsView: some View {
-        ScrollView(.vertical, showsIndicators: true) {
-            LazyVStack(spacing: 20) {
-                // Overall number percentages first
-                PercentageChart(
-                    title: "Overall Number Percentages",
-                    percentages: viewModel.numberPercentages
-                )
-                .padding(.top)
-                
-                // Special ball percentages second
-                PercentageChart(
-                    title: "\(viewModel.type.specialBallName) Percentages",
-                    percentages: viewModel.specialBallPercentages
-                )
-                
-                // Position-based percentages last
-                ForEach(viewModel.positionPercentages) { position in
-                    PercentageChart(
-                        title: "Position \(position.position) Percentages",
-                        percentages: position.percentages
-                    )
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(result.drawDate)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            
+            HStack {
+                ForEach(result.mainNumbers, id: \.self) { number in
+                    NumberBubble(number: number)
                 }
+                NumberBubble(number: result.specialBall, isSpecial: true)
+                Text("x\(result.multiplier)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 20)
         }
+        .padding(.vertical, 8)
     }
+}
+
+struct NumberBubble: View {
+    let number: Int
+    var isSpecial: Bool = false
     
-    private var combinationView: some View {
-        VStack(spacing: 20) {
-            Text("Select Your Numbers")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Main Numbers (select 5)")
-                    .font(.headline)
-                
-                NumberGrid(
-                    range: viewModel.type.mainNumberRange,
-                    selectedNumbers: viewModel.selectedNumbers,
-                    maxSelections: 5,
-                    onNumberTapped: viewModel.toggleNumber
-                )
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(viewModel.type.specialBallName) (select 1)")
-                    .font(.headline)
-                
-                NumberGrid(
-                    range: viewModel.type.specialBallRange,
-                    selectedNumbers: viewModel.selectedSpecialBall.map { [$0] } ?? [],
-                    maxSelections: 1,
-                    onNumberTapped: viewModel.selectSpecialBall
-                )
-            }
-            
-            HStack(spacing: 20) {
-                Button {
-                    Task {
-                        await viewModel.checkCombination()
-                    }
-                } label: {
-                    Text("Check Combination")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(viewModel.selectedNumbers.count != 5 || viewModel.selectedSpecialBall == nil)
-                
-                Button {
-                    Task {
-                        await viewModel.generateCombination()
-                    }
-                } label: {
-                    Text("Generate Combination")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            
-            if let exists = viewModel.combinationExists {
-                Text(exists ? "This combination has been drawn before!" : "This is a unique combination.")
-                    .foregroundColor(exists ? .red : .green)
-                    .font(.headline)
-                    .padding(.top)
-            }
-        }
+    var body: some View {
+        Text("\(number)")
+            .font(.system(.body, design: .rounded))
+            .frame(width: 32, height: 32)
+            .background(isSpecial ? Color.yellow.opacity(0.2) : Color.blue.opacity(0.2))
+            .clipShape(Circle())
     }
 }
 

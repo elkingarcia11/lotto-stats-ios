@@ -30,6 +30,25 @@ class LotteryViewModel: ObservableObject {
         var specialBallPercentages: [NumberPercentage] = []
     }
     
+    struct SearchState {
+        var isSearching: Bool = false
+        var showSearchSheet: Bool = false
+        var searchNumbers: Set<Int> = []
+        var searchSpecialBall: Int?
+        var searchResults: [LatestCombination] = []
+        
+        var canSearch: Bool {
+            searchNumbers.count == 5
+        }
+        
+        mutating func reset() {
+            searchNumbers.removeAll()
+            searchSpecialBall = nil
+            searchResults.removeAll()
+            isSearching = false
+        }
+    }
+    
     struct SelectionState {
         var selectedNumbers: Set<Int> = []
         var selectedSpecialBall: Int?
@@ -48,7 +67,10 @@ class LotteryViewModel: ObservableObject {
     @Published private(set) var viewState: ViewState = .idle
     @Published private(set) var frequencyState = FrequencyState()
     @Published var selectionState = SelectionState()
-    @Published var latestResults: [DrawResult] = []
+    @Published var searchState = SearchState()
+    @Published var latestResults: [LatestCombination] = []
+    @Published var hasMoreResults = false
+    @Published var currentPage = 1
     
     var error: String? {
         if case .error(let message) = viewState {
@@ -59,6 +81,10 @@ class LotteryViewModel: ObservableObject {
     
     var isLoading: Bool {
         viewState == .loading
+    }
+    
+    var oldestResultDate: Date {
+        latestResults.min { $0.date < $1.date }?.date ?? Date()
     }
     
     // MARK: - Initialization
@@ -72,25 +98,55 @@ class LotteryViewModel: ObservableObject {
         viewState = .loading
         
         do {
-            async let latestNumbersTask = networkService.fetchLatestNumbers(for: type, limit: nil)
-            async let frequencyTask = networkService.fetchFrequencies(for: type)
-            async let positionFrequencyTask = networkService.fetchPositionFrequencies(for: type)
-            async let specialBallFrequencyTask = networkService.fetchSpecialBallFrequencies(for: type)
+            async let latestTask = networkService.fetchLatestCombinations(for: type, page: 1, pageSize: 20)
+            async let mainFrequenciesTask = networkService.fetchNumberFrequencies(for: type, category: "main")
+            async let specialFrequenciesTask = networkService.fetchNumberFrequencies(for: type, category: "special")
+            async let positionFrequenciesTask = networkService.fetchPositionFrequencies(for: type, position: nil)
             
-            let (latestNumbersResponse, frequencyResponse, positionFrequencyResponse, specialBallFrequencyResponse) = 
-                try await (latestNumbersTask, frequencyTask, positionFrequencyTask, specialBallFrequencyTask)
+            let (latestResponse, mainFrequencies, specialFrequencies, positionFrequencies) = 
+                try await (latestTask, mainFrequenciesTask, specialFrequenciesTask, positionFrequenciesTask)
             
-            latestResults = latestNumbersResponse.data.latestNumbers
-            frequencyState.numberPercentages = parsePercentages(frequencyResponse.data.frequencies)
-            frequencyState.positionPercentages = parsePositionPercentages(positionFrequencyResponse.data.positionFrequencies)
+            latestResults = latestResponse.combinations
+            hasMoreResults = latestResponse.hasMore
             
-            // Handle special ball frequencies based on lottery type
-            let specialBallFreqs = type == .megaMillions ? 
-                specialBallFrequencyResponse.data.megaBallFrequencies :
-                specialBallFrequencyResponse.data.powerballFrequencies
-            frequencyState.specialBallPercentages = parsePercentages(specialBallFreqs)
+            frequencyState.numberPercentages = mainFrequencies.map(NumberPercentage.init)
+            frequencyState.specialBallPercentages = specialFrequencies.map(NumberPercentage.init)
+            
+            // Group position frequencies by position
+            let groupedPositions = Dictionary(grouping: positionFrequencies) { $0.position }
+            frequencyState.positionPercentages = groupedPositions.map { position, frequencies in
+                PositionPercentages(
+                    position: position,
+                    percentages: frequencies.map { frequency in
+                        NumberPercentage(from: NumberFrequency(
+                            number: frequency.number,
+                            count: frequency.count,
+                            percentage: frequency.percentage
+                        ))
+                    }
+                )
+            }.sorted { $0.position < $1.position }
             
             viewState = .loaded
+        } catch {
+            viewState = .error(error.localizedDescription)
+        }
+    }
+    
+    func loadMoreResults() async {
+        guard hasMoreResults else { return }
+        
+        do {
+            let nextPage = currentPage + 1
+            let response = try await networkService.fetchLatestCombinations(
+                for: type,
+                page: nextPage,
+                pageSize: 20
+            )
+            
+            latestResults.append(contentsOf: response.combinations)
+            hasMoreResults = response.hasMore
+            currentPage = nextPage
         } catch {
             viewState = .error(error.localizedDescription)
         }
@@ -106,25 +162,37 @@ class LotteryViewModel: ObservableObject {
         do {
             let response = try await networkService.checkCombination(
                 numbers: Array(selectionState.selectedNumbers).sorted(),
-                specialBall: selectionState.selectedSpecialBall!,
+                specialBall: selectionState.selectedSpecialBall,
                 type: type
             )
             
-            selectionState.winningDates = response.data.dates
-            selectionState.frequency = response.data.frequency
+            selectionState.winningDates = response.dates
+            selectionState.frequency = response.frequency
             viewState = .loaded
         } catch {
             viewState = .error(error.localizedDescription)
         }
     }
     
-    func generateCombination() async {
+    func generateCombination(optimized: Bool = true) async {
         viewState = .loading
         
         do {
-            let response = try await networkService.generateCombination(for: type)
-            selectionState.selectedNumbers = Set(response.data.mainNumbers)
-            selectionState.selectedSpecialBall = response.data.specialBall
+            let mainNumbers: [Int]
+            let specialBall: Int
+            
+            if optimized {
+                let response = try await networkService.generateOptimizedCombination(for: type)
+                mainNumbers = response.mainNumbers
+                specialBall = response.specialBall
+            } else {
+                let response = try await networkService.generateRandomCombination(for: type)
+                mainNumbers = response.mainNumbers
+                specialBall = response.specialBall
+            }
+            
+            selectionState.selectedNumbers = Set(mainNumbers)
+            selectionState.selectedSpecialBall = specialBall
             viewState = .loaded
         } catch {
             viewState = .error(error.localizedDescription)
@@ -149,33 +217,67 @@ class LotteryViewModel: ObservableObject {
         resetResults()
     }
     
+    // MARK: - Search Methods
+    func toggleSearchNumber(_ number: Int) {
+        if searchState.searchNumbers.contains(number) {
+            searchState.searchNumbers.remove(number)
+        } else if searchState.searchNumbers.count < 5 {
+            searchState.searchNumbers.insert(number)
+        }
+    }
+    
+    func toggleSearchSpecialBall(_ number: Int) {
+        if searchState.searchSpecialBall == number {
+            searchState.searchSpecialBall = nil
+        } else {
+            searchState.searchSpecialBall = number
+        }
+    }
+    
+    func searchWinningNumbers() async {
+        guard searchState.canSearch else { return }
+        
+        viewState = .loading
+        searchState.isSearching = true
+        searchState.searchResults.removeAll()
+        
+        do {
+            let response = try await networkService.checkCombination(
+                numbers: Array(searchState.searchNumbers).sorted(),
+                specialBall: searchState.searchSpecialBall,  // Pass the special ball if selected
+                type: type
+            )
+            
+            // Convert matches to LatestCombination objects
+            searchState.searchResults = response.matches.map { match in
+                LatestCombination(
+                    drawDate: match.date,
+                    mainNumbers: response.mainNumbers,
+                    specialBall: match.specialBall,
+                    prize: match.prize
+                )
+            }
+            viewState = .loaded
+        } catch {
+            viewState = .error(error.localizedDescription)
+        }
+    }
+    
+    func clearSearch() {
+        searchState.reset()
+    }
+    
+    func filteredResults(for date: Date) -> [LatestCombination] {
+        let calendar = Calendar.current
+        let endOfDay = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: date) ?? date
+        return latestResults.filter { combination in
+            combination.date <= endOfDay
+        }
+    }
+    
     // MARK: - Private Methods
     private func resetResults() {
         selectionState.winningDates = nil
         selectionState.frequency = nil
-    }
-    
-    private func parsePercentages(_ frequencies: [String: Double]?) -> [NumberPercentage] {
-        guard let frequencies = frequencies else { return [] }
-        
-        return frequencies
-            .compactMap { key, value in
-                guard let number = Int(key) else { return nil }
-                return NumberPercentage(number: number, percentage: value)
-            }
-            .sorted { $0.number < $1.number }
-    }
-    
-    private func parsePositionPercentages(_ positionFrequencies: [String: [String: Double]]?) -> [PositionPercentages] {
-        guard let positionFrequencies = positionFrequencies else { return [] }
-        return positionFrequencies
-            .compactMap { key, value in
-                guard let position = key.components(separatedBy: "_").last,
-                      let positionNumber = Int(position) else { return nil }
-                
-                let percentages = parsePercentages(value)
-                return PositionPercentages(position: positionNumber, percentages: percentages)
-            }
-            .sorted { $0.position < $1.position }
     }
 } 

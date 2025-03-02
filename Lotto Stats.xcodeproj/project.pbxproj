@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1E6E178A2D7150F30020236E /* LotteryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6E17892D7150F30020236E /* LotteryModelTests.swift */; };
+		1E2C22F62D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22F52D7434BA000F2FD5 /* SearchNumbersSheet.swift */; };
+		1E2C22F72D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22F52D7434BA000F2FD5 /* SearchNumbersSheet.swift */; };
+		1E2C22F82D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22F52D7434BA000F2FD5 /* SearchNumbersSheet.swift */; };
 		1EE51C6E2D7104DD0032BE5E /* Lotto_StatsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51C6D2D7104DD0032BE5E /* Lotto_StatsUITests.swift */; };
 		1EE51C702D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51C6F2D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift */; };
 		1EE51D282D7109020032BE5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51CF32D7109020032BE5E /* Preview Assets.xcassets */; };
@@ -38,27 +40,6 @@
 		1EE51DC62D710A5B0032BE5E /* LotteryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51DC42D710A5B0032BE5E /* LotteryViewModel.swift */; };
 		1EE51DC72D710A5B0032BE5E /* LotteryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51DC42D710A5B0032BE5E /* LotteryViewModel.swift */; };
 		1EE51DCF2D710A720032BE5E /* Lotto_StatsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51DC92D710A720032BE5E /* Lotto_StatsTests.swift */; };
-		1EE51DFF2D7119FB0032BE5E /* response_1740693992500.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DF82D7119FB0032BE5E /* response_1740693992500.json */; };
-		1EE51E002D7119FB0032BE5E /* response_1740693992500.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DF82D7119FB0032BE5E /* response_1740693992500.json */; };
-		1EE51E012D7119FB0032BE5E /* response_1740693992500.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DF82D7119FB0032BE5E /* response_1740693992500.json */; };
-		1EE51E022D7119FB0032BE5E /* response_1740694026339.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DF92D7119FB0032BE5E /* response_1740694026339.json */; };
-		1EE51E032D7119FB0032BE5E /* response_1740694026339.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DF92D7119FB0032BE5E /* response_1740694026339.json */; };
-		1EE51E042D7119FB0032BE5E /* response_1740694026339.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DF92D7119FB0032BE5E /* response_1740694026339.json */; };
-		1EE51E052D7119FB0032BE5E /* response_1740694038617.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFA2D7119FB0032BE5E /* response_1740694038617.json */; };
-		1EE51E062D7119FB0032BE5E /* response_1740694038617.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFA2D7119FB0032BE5E /* response_1740694038617.json */; };
-		1EE51E072D7119FB0032BE5E /* response_1740694038617.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFA2D7119FB0032BE5E /* response_1740694038617.json */; };
-		1EE51E082D7119FB0032BE5E /* response_1740694049278.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFB2D7119FB0032BE5E /* response_1740694049278.json */; };
-		1EE51E092D7119FB0032BE5E /* response_1740694049278.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFB2D7119FB0032BE5E /* response_1740694049278.json */; };
-		1EE51E0A2D7119FB0032BE5E /* response_1740694049278.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFB2D7119FB0032BE5E /* response_1740694049278.json */; };
-		1EE51E0B2D7119FB0032BE5E /* response_1740693963002.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFC2D7119FB0032BE5E /* response_1740693963002.json */; };
-		1EE51E0C2D7119FB0032BE5E /* response_1740693963002.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFC2D7119FB0032BE5E /* response_1740693963002.json */; };
-		1EE51E0D2D7119FB0032BE5E /* response_1740693963002.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFC2D7119FB0032BE5E /* response_1740693963002.json */; };
-		1EE51E0E2D7119FB0032BE5E /* response_1740693929903.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFD2D7119FB0032BE5E /* response_1740693929903.json */; };
-		1EE51E0F2D7119FB0032BE5E /* response_1740693929903.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFD2D7119FB0032BE5E /* response_1740693929903.json */; };
-		1EE51E102D7119FB0032BE5E /* response_1740693929903.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFD2D7119FB0032BE5E /* response_1740693929903.json */; };
-		1EE51E112D7119FB0032BE5E /* response_1740693978002.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFE2D7119FB0032BE5E /* response_1740693978002.json */; };
-		1EE51E122D7119FB0032BE5E /* response_1740693978002.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFE2D7119FB0032BE5E /* response_1740693978002.json */; };
-		1EE51E132D7119FB0032BE5E /* response_1740693978002.json in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51DFE2D7119FB0032BE5E /* response_1740693978002.json */; };
 		1EE51E152D7132C90032BE5E /* LotteryResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51E142D7132C90032BE5E /* LotteryResultView.swift */; };
 		1EE51E162D7132C90032BE5E /* LotteryResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51E142D7132C90032BE5E /* LotteryResultView.swift */; };
 		1EE51E172D7132C90032BE5E /* LotteryResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51E142D7132C90032BE5E /* LotteryResultView.swift */; };
@@ -88,7 +69,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1E6E17892D7150F30020236E /* LotteryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LotteryModelTests.swift; sourceTree = "<group>"; };
+		1E2C22F52D7434BA000F2FD5 /* SearchNumbersSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNumbersSheet.swift; sourceTree = "<group>"; };
 		1EE51C4F2D7104DC0032BE5E /* Lotto Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lotto Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EE51C5F2D7104DD0032BE5E /* Lotto StatsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Lotto StatsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EE51C692D7104DD0032BE5E /* Lotto StatsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Lotto StatsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,13 +85,6 @@
 		1EE51DBD2D710A4A0032BE5E /* FrequencyChart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FrequencyChart.swift; sourceTree = "<group>"; };
 		1EE51DC42D710A5B0032BE5E /* LotteryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LotteryViewModel.swift; sourceTree = "<group>"; };
 		1EE51DC92D710A720032BE5E /* Lotto_StatsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lotto_StatsTests.swift; sourceTree = "<group>"; };
-		1EE51DF82D7119FB0032BE5E /* response_1740693992500.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740693992500.json; sourceTree = "<group>"; };
-		1EE51DF92D7119FB0032BE5E /* response_1740694026339.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740694026339.json; sourceTree = "<group>"; };
-		1EE51DFA2D7119FB0032BE5E /* response_1740694038617.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740694038617.json; sourceTree = "<group>"; };
-		1EE51DFB2D7119FB0032BE5E /* response_1740694049278.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740694049278.json; sourceTree = "<group>"; };
-		1EE51DFC2D7119FB0032BE5E /* response_1740693963002.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740693963002.json; sourceTree = "<group>"; };
-		1EE51DFD2D7119FB0032BE5E /* response_1740693929903.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740693929903.json; sourceTree = "<group>"; };
-		1EE51DFE2D7119FB0032BE5E /* response_1740693978002.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = response_1740693978002.json; sourceTree = "<group>"; };
 		1EE51E142D7132C90032BE5E /* LotteryResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LotteryResultView.swift; sourceTree = "<group>"; };
 		1EE51E182D7138410032BE5E /* LatestNumbersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatestNumbersView.swift; sourceTree = "<group>"; };
 		1EE51E1C2D713B110032BE5E /* FrequencyChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyChartsView.swift; sourceTree = "<group>"; };
@@ -167,7 +141,6 @@
 			isa = PBXGroup;
 			children = (
 				1EE51DC92D710A720032BE5E /* Lotto_StatsTests.swift */,
-				1E6E17892D7150F30020236E /* LotteryModelTests.swift */,
 			);
 			path = "Lotto StatsTests";
 			sourceTree = "<group>";
@@ -179,20 +152,6 @@
 				1EE51C6F2D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift */,
 			);
 			path = "Lotto StatsUITests";
-			sourceTree = "<group>";
-		};
-		1EE51CF02D7109020032BE5E /* Mock Data */ = {
-			isa = PBXGroup;
-			children = (
-				1EE51DFD2D7119FB0032BE5E /* response_1740693929903.json */,
-				1EE51DFC2D7119FB0032BE5E /* response_1740693963002.json */,
-				1EE51DFE2D7119FB0032BE5E /* response_1740693978002.json */,
-				1EE51DF82D7119FB0032BE5E /* response_1740693992500.json */,
-				1EE51DF92D7119FB0032BE5E /* response_1740694026339.json */,
-				1EE51DFA2D7119FB0032BE5E /* response_1740694038617.json */,
-				1EE51DFB2D7119FB0032BE5E /* response_1740694049278.json */,
-			);
-			path = "Mock Data";
 			sourceTree = "<group>";
 		};
 		1EE51CF22D7109020032BE5E /* Models */ = {
@@ -235,6 +194,7 @@
 				1EE51E142D7132C90032BE5E /* LotteryResultView.swift */,
 				1EE51E182D7138410032BE5E /* LatestNumbersView.swift */,
 				1EE51E1C2D713B110032BE5E /* FrequencyChartsView.swift */,
+				1E2C22F52D7434BA000F2FD5 /* SearchNumbersSheet.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -251,7 +211,6 @@
 		1EE51D012D7109020032BE5E /* Lotto Stats */ = {
 			isa = PBXGroup;
 			children = (
-				1EE51CF02D7109020032BE5E /* Mock Data */,
 				1EE51CF22D7109020032BE5E /* Models */,
 				1EE51CF42D7109020032BE5E /* Preview Content */,
 				1EE51CF62D7109020032BE5E /* Services */,
@@ -375,15 +334,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1EE51E082D7119FB0032BE5E /* response_1740694049278.json in Resources */,
 				1EE51D3A2D7109020032BE5E /* Assets.xcassets in Resources */,
-				1EE51E052D7119FB0032BE5E /* response_1740694038617.json in Resources */,
 				1EE51D282D7109020032BE5E /* Preview Assets.xcassets in Resources */,
-				1EE51E112D7119FB0032BE5E /* response_1740693978002.json in Resources */,
-				1EE51E0B2D7119FB0032BE5E /* response_1740693963002.json in Resources */,
-				1EE51E022D7119FB0032BE5E /* response_1740694026339.json in Resources */,
-				1EE51DFF2D7119FB0032BE5E /* response_1740693992500.json in Resources */,
-				1EE51E0E2D7119FB0032BE5E /* response_1740693929903.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,15 +343,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1EE51E092D7119FB0032BE5E /* response_1740694049278.json in Resources */,
 				1EE51D292D7109020032BE5E /* Preview Assets.xcassets in Resources */,
-				1EE51E062D7119FB0032BE5E /* response_1740694038617.json in Resources */,
 				1EE51D3B2D7109020032BE5E /* Assets.xcassets in Resources */,
-				1EE51E122D7119FB0032BE5E /* response_1740693978002.json in Resources */,
-				1EE51E0C2D7119FB0032BE5E /* response_1740693963002.json in Resources */,
-				1EE51E032D7119FB0032BE5E /* response_1740694026339.json in Resources */,
-				1EE51E002D7119FB0032BE5E /* response_1740693992500.json in Resources */,
-				1EE51E0F2D7119FB0032BE5E /* response_1740693929903.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,15 +352,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1EE51E0A2D7119FB0032BE5E /* response_1740694049278.json in Resources */,
 				1EE51D2A2D7109020032BE5E /* Preview Assets.xcassets in Resources */,
-				1EE51E072D7119FB0032BE5E /* response_1740694038617.json in Resources */,
 				1EE51D3C2D7109020032BE5E /* Assets.xcassets in Resources */,
-				1EE51E132D7119FB0032BE5E /* response_1740693978002.json in Resources */,
-				1EE51E0D2D7119FB0032BE5E /* response_1740693963002.json in Resources */,
-				1EE51E042D7119FB0032BE5E /* response_1740694026339.json in Resources */,
-				1EE51E012D7119FB0032BE5E /* response_1740693992500.json in Resources */,
-				1EE51E102D7119FB0032BE5E /* response_1740693929903.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +371,7 @@
 				1EE51DA92D7109EB0032BE5E /* Lotto_StatsApp.swift in Sources */,
 				1EE51DBE2D710A4A0032BE5E /* NumberGrid.swift in Sources */,
 				1EE51E152D7132C90032BE5E /* LotteryResultView.swift in Sources */,
+				1E2C22F62D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */,
 				1EE51D2B2D7109020032BE5E /* NetworkService.swift in Sources */,
 				1EE51D752D7109A20032BE5E /* LotteryModels.swift in Sources */,
 				1EE51DB92D710A3E0032BE5E /* LotteryView.swift in Sources */,
@@ -445,10 +384,10 @@
 			files = (
 				1EE51DC62D710A5B0032BE5E /* LotteryViewModel.swift in Sources */,
 				1EE51D2C2D7109020032BE5E /* NetworkService.swift in Sources */,
+				1E2C22F72D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */,
 				1EE51E1E2D713B110032BE5E /* FrequencyChartsView.swift in Sources */,
 				1EE51DBA2D710A3E0032BE5E /* LotteryView.swift in Sources */,
 				1EE51E1A2D7138410032BE5E /* LatestNumbersView.swift in Sources */,
-				1E6E178A2D7150F30020236E /* LotteryModelTests.swift in Sources */,
 				1EE51DCF2D710A720032BE5E /* Lotto_StatsTests.swift in Sources */,
 				1EE51DAA2D7109EB0032BE5E /* Lotto_StatsApp.swift in Sources */,
 				1EE51E162D7132C90032BE5E /* LotteryResultView.swift in Sources */,
@@ -474,6 +413,7 @@
 				1EE51C702D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift in Sources */,
 				1EE51DC02D710A4A0032BE5E /* NumberGrid.swift in Sources */,
 				1EE51E172D7132C90032BE5E /* LotteryResultView.swift in Sources */,
+				1E2C22F82D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

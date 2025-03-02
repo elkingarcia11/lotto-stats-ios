@@ -50,154 +50,105 @@ extension LotteryType: LotteryGame {
 }
 
 // MARK: - API Response Models
-struct APIResponse<T: Codable>: Codable {
-    let success: Bool
-    let data: T
-    let message: String?
-}
-
-typealias FrequencyResponse = APIResponse<FrequencyData>
-typealias CombinationResponse = APIResponse<CombinationData>
-typealias LatestNumbersResponse = APIResponse<LatestNumbersData>
-
-struct FrequencyData: Codable {
-    let frequencies: [String: Double]?
-    let positionFrequencies: [String: [String: Double]]?
-    let megaBallFrequencies: [String: Double]?
-    let powerballFrequencies: [String: Double]?
+struct NumberFrequency: Codable, Identifiable {
+    let number: Int
+    let count: Int
+    let percentage: Double
     
-    enum CodingKeys: String, CodingKey {
-        case frequencies
-        case positionFrequencies = "position_frequencies"
-        case megaBallFrequencies = "megaball_frequencies"
-        case powerballFrequencies = "powerball_frequencies"
-    }
+    var id: Int { number }
 }
 
-struct CombinationData: Codable {
+struct PositionFrequency: Codable {
+    let position: Int
+    let number: Int
+    let count: Int
+    let percentage: Double
+}
+
+struct CombinationCheckResponse: Codable {
     let exists: Bool
     let frequency: Int?
     let dates: [String]?
     let mainNumbers: [Int]
-    let specialBall: Int
-    let attemptsNeeded: Int?
+    let specialBall: Int?
+    let matches: [Match]
     
     enum CodingKeys: String, CodingKey {
-        case exists
-        case frequency
-        case dates
+        case exists, frequency, dates, matches
         case mainNumbers = "main_numbers"
-        case megaBall = "mega_ball"
-        case powerball
-        case attemptsNeeded = "attempts_needed"
+        case specialBall = "special_ball"
     }
     
-    init(exists: Bool, frequency: Int?, dates: [String]?, mainNumbers: [Int], specialBall: Int, attemptsNeeded: Int? = nil) {
-        self.exists = exists
-        self.frequency = frequency
-        self.dates = dates
-        self.mainNumbers = mainNumbers
-        self.specialBall = specialBall
-        self.attemptsNeeded = attemptsNeeded
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        exists = try container.decodeIfPresent(Bool.self, forKey: .exists) ?? false
-        frequency = try container.decodeIfPresent(Int.self, forKey: .frequency)
-        dates = try container.decodeIfPresent([String].self, forKey: .dates)
-        mainNumbers = try container.decode([Int].self, forKey: .mainNumbers)
-        attemptsNeeded = try container.decodeIfPresent(Int.self, forKey: .attemptsNeeded)
+    struct Match: Codable {
+        let date: String
+        let specialBall: Int
+        let prize: String?
         
-        // Try to decode either mega_ball or powerball
-        if let megaBall = try? container.decode(Int.self, forKey: .megaBall) {
-            specialBall = megaBall
-        } else if let powerball = try? container.decode(Int.self, forKey: .powerball) {
-            specialBall = powerball
-        } else {
-            throw DecodingError.dataCorruptedError(
-                forKey: .megaBall,
-                in: container,
-                debugDescription: "Neither mega_ball nor powerball found"
-            )
+        enum CodingKeys: String, CodingKey {
+            case date
+            case specialBall = "special_ball"
+            case prize
         }
     }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(exists, forKey: .exists)
-        try container.encodeIfPresent(frequency, forKey: .frequency)
-        try container.encodeIfPresent(dates, forKey: .dates)
-        try container.encode(mainNumbers, forKey: .mainNumbers)
-        try container.encodeIfPresent(attemptsNeeded, forKey: .attemptsNeeded)
-        // Encode based on the type
-        try container.encode(specialBall, forKey: .megaBall)
-    }
 }
 
-struct LatestNumbersData: Codable {
-    let latestNumbers: [DrawResult]
+struct OptimizedCombination: Codable {
+    let mainNumbers: [Int]
+    let specialBall: Int
+    let positionPercentages: [String: Double]
+    let isUnique: Bool
     
     enum CodingKeys: String, CodingKey {
-        case latestNumbers = "latest_numbers"
+        case mainNumbers = "main_numbers"
+        case specialBall = "special_ball"
+        case positionPercentages = "position_percentages"
+        case isUnique = "is_unique"
     }
 }
 
-struct DrawResult: Codable, Identifiable {
-    let id: String
+struct RandomCombination: Codable {
+    let mainNumbers: [Int]
+    let specialBall: Int
+    let isUnique: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case mainNumbers = "main_numbers"
+        case specialBall = "special_ball"
+        case isUnique = "is_unique"
+    }
+}
+
+struct LatestCombination: Codable, Identifiable {
     let drawDate: String
     let mainNumbers: [Int]
     let specialBall: Int
-    let multiplier: Int
+    let prize: String?
+    
+    var id: String { drawDate }
+    
+    var date: Date {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: drawDate) ?? Date()
+    }
     
     enum CodingKeys: String, CodingKey {
         case drawDate = "draw_date"
         case mainNumbers = "main_numbers"
-        case megaBall = "mega_ball"
-        case powerball
-        case multiplier
+        case specialBall = "special_ball"
+        case prize
     }
+}
+
+struct LatestCombinationsResponse: Codable {
+    let combinations: [LatestCombination]
+    let totalCount: Int
+    let hasMore: Bool
     
-    init(drawDate: String, mainNumbers: [Int], specialBall: Int, multiplier: Int) {
-        self.drawDate = drawDate
-        self.mainNumbers = mainNumbers
-        self.specialBall = specialBall
-        self.multiplier = multiplier
-        self.id = drawDate
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        drawDate = try container.decode(String.self, forKey: .drawDate)
-        mainNumbers = try container.decode([Int].self, forKey: .mainNumbers)
-        
-        // Handle multiplier as Double and convert to Int
-        let multiplierDouble = try container.decode(Double.self, forKey: .multiplier)
-        multiplier = Int(multiplierDouble)
-        
-        // Try to decode either mega_ball or powerball
-        if let megaBall = try? container.decode(Int.self, forKey: .megaBall) {
-            specialBall = megaBall
-        } else if let powerball = try? container.decode(Int.self, forKey: .powerball) {
-            specialBall = powerball
-        } else {
-            throw DecodingError.dataCorruptedError(
-                forKey: .megaBall,
-                in: container,
-                debugDescription: "Neither mega_ball nor powerball found"
-            )
-        }
-        
-        id = drawDate
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(drawDate, forKey: .drawDate)
-        try container.encode(mainNumbers, forKey: .mainNumbers)
-        try container.encode(Double(multiplier), forKey: .multiplier)
-        // Always encode as mega_ball for consistency
-        try container.encode(specialBall, forKey: .megaBall)
+    enum CodingKeys: String, CodingKey {
+        case combinations
+        case totalCount = "total_count"
+        case hasMore = "has_more"
     }
 }
 
@@ -205,7 +156,14 @@ struct DrawResult: Codable, Identifiable {
 struct NumberPercentage: Identifiable, Equatable {
     let id = UUID()
     let number: Int
+    let count: Int
     let percentage: Double
+    
+    init(from frequency: NumberFrequency) {
+        self.number = frequency.number
+        self.count = frequency.count
+        self.percentage = frequency.percentage
+    }
     
     static func == (lhs: NumberPercentage, rhs: NumberPercentage) -> Bool {
         lhs.number == rhs.number

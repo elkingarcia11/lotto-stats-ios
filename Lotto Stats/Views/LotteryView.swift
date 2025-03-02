@@ -1,5 +1,11 @@
 import SwiftUI
 
+enum Tab: Int {
+    case latest
+    case analysis
+    case pickNumbers
+}
+
 struct LotteryView: View {
     @StateObject private var viewModel: LotteryViewModel
     @State private var showingResults = false
@@ -12,31 +18,37 @@ struct LotteryView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
+            // Latest Results Tab
+            LatestNumbersView(viewModel: viewModel)
+                .tabItem {
+                    Label("Latest", systemImage: "list.number")
+                }
+                .tag(Tab.latest)
+            
+            // Frequency Analysis Tab
+            FrequencyChartsView(
+                lotteryType: viewModel.type,
+                numberPercentages: viewModel.frequencyState.numberPercentages,
+                positionPercentages: Dictionary(
+                    viewModel.frequencyState.positionPercentages.map { 
+                        ($0.position - 1, $0.percentages) 
+                    },
+                    uniquingKeysWith: { first, _ in first }
+                ),
+                specialBallPercentages: viewModel.frequencyState.specialBallPercentages
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .tabItem {
+                Label("Analysis", systemImage: "chart.bar")
+            }
+            .tag(Tab.analysis)
+            
             // Pick Numbers Tab
             pickNumbersView
                 .tabItem {
                     Label("Pick Numbers", systemImage: "number.circle")
                 }
-                .tag(0)
-            
-            // Latest Results Tab
-            LatestNumbersView(type: viewModel.type, results: viewModel.latestResults)
-                .tabItem {
-                    Label("Latest Results", systemImage: "list.bullet")
-                }
-                .tag(1)
-            
-            // Frequency Analysis Tab
-            FrequencyChartsView(
-                type: viewModel.type,
-                numberPercentages: viewModel.frequencyState.numberPercentages,
-                positionPercentages: viewModel.frequencyState.positionPercentages,
-                specialBallPercentages: viewModel.frequencyState.specialBallPercentages
-            )
-            .tabItem {
-                Label("Analysis", systemImage: "chart.bar")
-            }
-            .tag(2)
+                .tag(Tab.pickNumbers)
         }
         .task {
             await viewModel.loadAllData()
@@ -127,29 +139,6 @@ struct LotteryView: View {
                 )
             }
         }
-    }
-}
-
-struct DrawResultRow: View {
-    let result: DrawResult
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(result.drawDate)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            HStack {
-                ForEach(result.mainNumbers, id: \.self) { number in
-                    NumberBubble(number: number)
-                }
-                NumberBubble(number: result.specialBall, isSpecial: true)
-                Text("x\(result.multiplier)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding(.vertical, 8)
     }
 }
 

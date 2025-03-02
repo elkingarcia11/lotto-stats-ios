@@ -5,6 +5,7 @@ struct GenerateNumbersView: View {
     @State private var generatedCombination: LotteryGenerationResponse?
     @State private var isLoading = false
     @State private var error: String?
+    @State private var animationId = UUID()
     
     var body: some View {
         ScrollView {
@@ -12,12 +13,11 @@ struct GenerateNumbersView: View {
                 // Generated Numbers Display
                 if let combination = generatedCombination {
                     GeneratedCombinationCard(combination: combination)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 } else if !isLoading {
                     EmptyGenerationState()
+                        .transition(.opacity)
                 }
-                
-                // Disclaimer
-                LotteryDisclaimerText()
                 
                 // Generate Buttons
                 GenerationControls { isOptimized in
@@ -25,14 +25,20 @@ struct GenerateNumbersView: View {
                         await generateNumbers(optimized: isOptimized)
                     }
                 }
+                
+                // Disclaimer moved to bottom
+                LotteryDisclaimerText()
             }
             .padding()
+            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: animationId)
         }
         .overlay {
             if isLoading {
                 LoadingOverlay()
+                    .transition(.opacity)
             }
         }
+        .animation(.easeInOut, value: isLoading)
         .alert("Error", isPresented: .init(
             get: { error != nil },
             set: { if !$0 { error = nil } }
@@ -58,6 +64,7 @@ struct GenerateNumbersView: View {
             
             let (data, _) = try await URLSession.shared.data(from: url)
             generatedCombination = try JSONDecoder().decode(LotteryGenerationResponse.self, from: data)
+            animationId = UUID()
         } catch {
             self.error = error.localizedDescription
         }
@@ -72,26 +79,33 @@ private struct GeneratedCombinationCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Generated Numbers")
-                .font(.headline)
+            Text("Your Numbers")
+                .font(.title2.bold())
+                .foregroundColor(.primary)
             
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 ForEach(combination.main_numbers.sorted(), id: \.self) { number in
                     NumberBubble(number: number)
                 }
                 NumberBubble(number: combination.special_ball, isSpecial: true)
             }
+            .padding(.vertical, 8)
             
             if let percentages = combination.position_percentages, !percentages.isEmpty {
+                Divider()
                 PositionPercentagesView(percentages: percentages)
                 OptimizedGenerationNote()
             } else {
+                Divider()
                 RandomGenerationNote()
             }
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 2)
+        )
     }
 }
 
@@ -138,21 +152,30 @@ private struct RandomGenerationNote: View {
 /// Displays a placeholder state when no numbers have been generated
 private struct EmptyGenerationState: View {
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "ticket")
-                .font(.system(size: 40))
-                .foregroundColor(.gray)
-            Text("No numbers generated yet")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            Text("Use the buttons below to generate numbers")
+        VStack(spacing: 16) {
+            Image(systemName: "ticket.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(
+                    LinearGradient(colors: [.blue.opacity(0.8), .blue.opacity(0.6)],
+                                 startPoint: .top,
+                                 endPoint: .bottom)
+                )
+            
+            Text("Ready to Try Your Luck?")
+                .font(.title3.bold())
+                .foregroundColor(.primary)
+            
+            Text("Generate your numbers below")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(.vertical, 40)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 2)
+        )
     }
 }
 
@@ -164,6 +187,7 @@ private struct LotteryDisclaimerText: View {
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
+            .padding(.top, 8)
     }
 }
 
@@ -180,12 +204,18 @@ private struct GenerationControls: View {
                 HStack {
                     Image(systemName: "wand.and.stars")
                     Text("Generate Optimized Numbers")
+                        .fontWeight(.semibold)
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.blue)
+                .padding(.vertical, 16)
+                .background(
+                    LinearGradient(colors: [.blue, .blue.opacity(0.8)],
+                                 startPoint: .top,
+                                 endPoint: .bottom)
+                )
                 .foregroundColor(.white)
-                .cornerRadius(10)
+                .cornerRadius(12)
+                .shadow(color: .blue.opacity(0.3), radius: 5, x: 0, y: 2)
             }
             
             Button {
@@ -194,12 +224,13 @@ private struct GenerationControls: View {
                 HStack {
                     Image(systemName: "dice")
                     Text("Generate Random Numbers")
+                        .fontWeight(.semibold)
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color(.systemGray4))
+                .padding(.vertical, 16)
+                .background(Color(.systemGray5))
                 .foregroundColor(.primary)
-                .cornerRadius(10)
+                .cornerRadius(12)
             }
         }
     }
@@ -208,10 +239,24 @@ private struct GenerationControls: View {
 /// Overlay view displayed during number generation
 private struct LoadingOverlay: View {
     var body: some View {
-        ProgressView()
-            .scaleEffect(1.5)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black.opacity(0.2))
+        ZStack {
+            Color.black.opacity(0.2)
+            
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .frame(width: 120, height: 120)
+                .overlay {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                        Text("Generating...")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .shadow(color: .black.opacity(0.1), radius: 10)
+        }
+        .ignoresSafeArea()
     }
 }
 

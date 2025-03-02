@@ -13,6 +13,9 @@
 		1E2C22FA2D743B03000F2FD5 /* GenerateNumbersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22F92D743B03000F2FD5 /* GenerateNumbersView.swift */; };
 		1E2C22FB2D743B03000F2FD5 /* GenerateNumbersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22F92D743B03000F2FD5 /* GenerateNumbersView.swift */; };
 		1E2C22FC2D743B03000F2FD5 /* GenerateNumbersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22F92D743B03000F2FD5 /* GenerateNumbersView.swift */; };
+		1E2C22FF2D743E20000F2FD5 /* NumberBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22FE2D743E20000F2FD5 /* NumberBubble.swift */; };
+		1E2C23002D743E20000F2FD5 /* NumberBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22FE2D743E20000F2FD5 /* NumberBubble.swift */; };
+		1E2C23012D743E20000F2FD5 /* NumberBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E2C22FE2D743E20000F2FD5 /* NumberBubble.swift */; };
 		1EE51C6E2D7104DD0032BE5E /* Lotto_StatsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51C6D2D7104DD0032BE5E /* Lotto_StatsUITests.swift */; };
 		1EE51C702D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE51C6F2D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift */; };
 		1EE51D282D7109020032BE5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1EE51CF32D7109020032BE5E /* Preview Assets.xcassets */; };
@@ -74,6 +77,7 @@
 /* Begin PBXFileReference section */
 		1E2C22F52D7434BA000F2FD5 /* SearchNumbersSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNumbersSheet.swift; sourceTree = "<group>"; };
 		1E2C22F92D743B03000F2FD5 /* GenerateNumbersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateNumbersView.swift; sourceTree = "<group>"; };
+		1E2C22FE2D743E20000F2FD5 /* NumberBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberBubble.swift; sourceTree = "<group>"; };
 		1EE51C4F2D7104DC0032BE5E /* Lotto Stats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lotto Stats.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EE51C5F2D7104DD0032BE5E /* Lotto StatsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Lotto StatsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EE51C692D7104DD0032BE5E /* Lotto StatsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Lotto StatsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -120,6 +124,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1E2C22FD2D743E0F000F2FD5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				1E2C22FE2D743E20000F2FD5 /* NumberBubble.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		1EE51C462D7104DC0032BE5E = {
 			isa = PBXGroup;
 			children = (
@@ -193,6 +205,7 @@
 		1EE51CFB2D7109020032BE5E /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				1E2C22FD2D743E0F000F2FD5 /* Shared */,
 				1EE51DBD2D710A4A0032BE5E /* FrequencyChart.swift */,
 				1EE51DBC2D710A4A0032BE5E /* NumberGrid.swift */,
 				1EE51E142D7132C90032BE5E /* LotteryResultView.swift */,
@@ -374,6 +387,7 @@
 				1EE51E1D2D713B110032BE5E /* FrequencyChartsView.swift in Sources */,
 				1EE51DC12D710A4A0032BE5E /* FrequencyChart.swift in Sources */,
 				1EE51DA92D7109EB0032BE5E /* Lotto_StatsApp.swift in Sources */,
+				1E2C22FF2D743E20000F2FD5 /* NumberBubble.swift in Sources */,
 				1EE51DBE2D710A4A0032BE5E /* NumberGrid.swift in Sources */,
 				1E2C22FA2D743B03000F2FD5 /* GenerateNumbersView.swift in Sources */,
 				1EE51E152D7132C90032BE5E /* LotteryResultView.swift in Sources */,
@@ -392,6 +406,7 @@
 				1EE51D2C2D7109020032BE5E /* NetworkService.swift in Sources */,
 				1E2C22F72D7434BA000F2FD5 /* SearchNumbersSheet.swift in Sources */,
 				1EE51E1E2D713B110032BE5E /* FrequencyChartsView.swift in Sources */,
+				1E2C23002D743E20000F2FD5 /* NumberBubble.swift in Sources */,
 				1EE51DBA2D710A3E0032BE5E /* LotteryView.swift in Sources */,
 				1EE51E1A2D7138410032BE5E /* LatestNumbersView.swift in Sources */,
 				1E2C22FB2D743B03000F2FD5 /* GenerateNumbersView.swift in Sources */,
@@ -418,6 +433,7 @@
 				1EE51D2D2D7109020032BE5E /* NetworkService.swift in Sources */,
 				1EE51D772D7109A20032BE5E /* LotteryModels.swift in Sources */,
 				1EE51C702D7104DD0032BE5E /* Lotto_StatsUITestsLaunchTests.swift in Sources */,
+				1E2C23012D743E20000F2FD5 /* NumberBubble.swift in Sources */,
 				1EE51DC02D710A4A0032BE5E /* NumberGrid.swift in Sources */,
 				1EE51E172D7132C90032BE5E /* LotteryResultView.swift in Sources */,
 				1E2C22FC2D743B03000F2FD5 /* GenerateNumbersView.swift in Sources */,

@@ -142,19 +142,6 @@ struct LotteryView: View {
     }
 }
 
-struct NumberBubble: View {
-    let number: Int
-    var isSpecial: Bool = false
-    
-    var body: some View {
-        Text("\(number)")
-            .font(.system(.body, design: .rounded))
-            .frame(width: 32, height: 32)
-            .background(isSpecial ? Color.yellow.opacity(0.2) : Color.blue.opacity(0.2))
-            .clipShape(Circle())
-    }
-}
-
 struct LotteryView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

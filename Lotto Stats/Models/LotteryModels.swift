@@ -181,3 +181,12 @@ struct ErrorResponse: Codable {
     let success: Bool
     let message: String?
 } 
+
+/// A view that allows users to generate lottery number combinations
+/// - Note: Supports both optimized and random number generation with position-based analysis
+struct LotteryGenerationResponse: Codable {
+    let main_numbers: [Int]
+    let special_ball: Int
+    let position_percentages: [String: Double]?
+    let is_unique: Bool
+}

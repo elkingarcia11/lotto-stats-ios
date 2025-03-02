@@ -3,7 +3,7 @@ import SwiftUI
 enum Tab: Int {
     case latest
     case analysis
-    case pickNumbers
+    case generate
 }
 
 struct LotteryView: View {
@@ -43,12 +43,12 @@ struct LotteryView: View {
             }
             .tag(Tab.analysis)
             
-            // Pick Numbers Tab
-            pickNumbersView
+            // Generate Numbers Tab
+            GenerateNumbersView(type: viewModel.type)
                 .tabItem {
-                    Label("Pick Numbers", systemImage: "number.circle")
+                    Label("Generate", systemImage: "wand.and.stars")
                 }
-                .tag(Tab.pickNumbers)
+                .tag(Tab.generate)
         }
         .task {
             await viewModel.loadAllData()

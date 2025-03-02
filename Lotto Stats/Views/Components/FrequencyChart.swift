@@ -144,8 +144,8 @@ struct ChartContentView: View {
             }
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(maxHeight: isByPosition ? 300 : nil)
         }
+        .frame(maxHeight: isByPosition ? 300 : nil)
     }
 }
 
@@ -199,7 +199,10 @@ struct PercentageBarView: View {
                 Rectangle()
                     .fill(
                         LinearGradient(
-                            colors: [.blue.opacity(0.8), .blue.opacity(0.4)],
+                            colors: [
+                                Color.blue.opacity(0.3),
+                                Color.blue.opacity(0.15)
+                            ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )

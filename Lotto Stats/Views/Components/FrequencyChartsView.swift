@@ -13,8 +13,8 @@ struct FrequencyChartsView: View {
             // Tab Picker
             Picker("Chart Type", selection: $selectedTab) {
                 Text("General").tag(0)
-                Text("By Position").tag(1)
-                Text(lotteryType.specialBallName).tag(2)
+                Text(lotteryType.specialBallName).tag(1)
+                Text("By Position").tag(2)
             }
             .pickerStyle(.segmented)
             .padding()
@@ -37,6 +37,22 @@ struct FrequencyChartsView: View {
                 }
                 .tag(0)
                 
+                // Special Ball Frequencies
+                GeometryReader { geometry in
+                    ScrollView {
+                        VStack {
+                            PercentageChart(
+                                title: "\(lotteryType == .megaMillions ? "Mega Ball" : "Powerball") Frequencies",
+                                percentages: specialBallPercentages
+                            )
+                            .padding()
+                            Spacer(minLength: 0)
+                        }
+                        .frame(minHeight: geometry.size.height)
+                    }
+                }
+                .tag(1)
+                
                 // Position Frequencies
                 ScrollView {
                     VStack(spacing: 16) {
@@ -52,22 +68,6 @@ struct FrequencyChartsView: View {
                         }
                     }
                     .padding(.vertical)
-                }
-                .tag(1)
-                
-                // Special Ball Frequencies
-                GeometryReader { geometry in
-                    ScrollView {
-                        VStack {
-                            PercentageChart(
-                                title: "\(lotteryType == .megaMillions ? "Mega Ball" : "Powerball") Frequencies",
-                                percentages: specialBallPercentages
-                            )
-                            .padding()
-                            Spacer(minLength: 0)
-                        }
-                        .frame(minHeight: geometry.size.height)
-                    }
                 }
                 .tag(2)
             }
